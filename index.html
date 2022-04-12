@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="vendor/css/materialize-1.0.0.min.css" />
+    <link rel="stylesheet" href="fontawesome-free-6.0.0-web/css/all.min.css" />
+    <link rel="stylesheet" href="style/style.css" />
+    <title>CronTaskEditor</title>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav>
+      <div class="nav-wrapper blue">
+        <div class="container">
+          <a href="#" class="brand-logo center">CronTaskEditor</a>
+        </div>
+      </div>
+    </nav>
+
+    <br />
+
+    <!-- Page Layout here -->
+    <div class="container">
+      <div class="row">
+        <div class="col s4">
+          <div class="card">
+            <div class="card-content">
+              <span class="cardtitle">Добавление новой Cron Задачи</span>
+              <form>
+                <div class="input-field">
+                  <input
+                    type="text"
+                    placeholder="Название задачи"
+                    id="item-name"
+                  />
+                  <label for="item-name">Название (Опционально)</label>
+                </div>
+
+                <div class="input-field">
+                  <input
+                    type="text"
+                    class="path-to-task"
+                    id="command"
+                    placeholder="/путь/к/исполняемому/файлу"
+                  />
+                  <label for="time">Исполняемый файл</label>
+                </div>
+                <div class="row">
+                  <!-- Switch -->
+                  <div class="input-field">
+                    <div class="switch">
+                      <label>
+                        Дата
+                        <input class="date-type" type="checkbox" />
+                        <span class="lever"></span>
+                        Ключевое слово
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="minute-wrapper input-field col s4">
+                    <div class="input-field">
+                      <input
+                        id="minute"
+                        type="text"
+                        class="validate"
+                        placeholder="*"
+                      />
+                      <label for="minute">Минута</label>
+                    </div>
+                  </div>
+
+                  <div class="hour-wrapper input-field col s4">
+                    <div class="input-field">
+                      <input
+                        id="hour"
+                        type="text"
+                        class="validate"
+                        placeholder="*"
+                      />
+                      <label for="hour">Час</label>
+                    </div>
+                  </div>
+
+                  <div class="day-wrapper input-field col s4">
+                    <div class="input-field">
+                      <input
+                        id="day"
+                        type="text"
+                        class="validate"
+                        placeholder="*"
+                      />
+                      <label for="day">День</label>
+                    </div>
+                  </div>
+
+                  <div class="month-wrapper input-field col s4">
+                    <div class="input-field">
+                      <input
+                        id="month"
+                        type="text"
+                        class="validate"
+                        placeholder="*"
+                      />
+                      <label for="month">Месяц</label>
+                    </div>
+                  </div>
+
+                  <div class="weekday-wrapper input-field col s4">
+                    <div class="input-field">
+                      <input
+                        id="weekday"
+                        type="text"
+                        class="validate"
+                        placeholder="*"
+                      />
+                      <label for="weekday">День недели</label>
+                    </div>
+                  </div>
+
+                  <div class="keyword-date-wrapper input-field col s12">
+                    <select class="keyword-date">
+                      <option value="" disabled selected>Ключевое слово</option>
+                      <option value="@reboot">
+                        При загрузке, только один раз
+                      </option>
+                      <option value="@hourly">Каждый час</option>
+                      <option value="@daily">Каждый день</option>
+                      <option value="@weekly">Раз в неделю</option>
+                      <option value="@monthly">Раз в месяц</option>
+                      <option value="@yearly">Раз год</option>
+                    </select>
+                    <label>Переодичность</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <button class="add-btn btn blue darken-3">
+                    <i class="fa fa-plus"></i>
+                    <span>Добавить</span>
+                  </button>
+
+                  <button class="update-btn btn orange">
+                    <i class="fa fa-pencil-square"></i> <span>Обновить</span>
+                  </button>
+                  <button class="delete-btn btn red">
+                    <i class="fa fa-remove"></i> Удалить
+                  </button>
+
+                  <button class="back-btn btn grey pull-right">
+                    <i class="fa fa-chevron-circle-left"></i> Назад
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col s8">
+          <!-- table test -->
+
+          <table id="item-table" class="collection-table">
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th>Задача</th>
+                <th>Время</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody class="item-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Form Card -->
+    </div>
+
+    <script src="vendor/js/materialze-1.0.0.min.js"></script>
+    <script src="js/http.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
