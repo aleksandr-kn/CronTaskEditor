@@ -6,38 +6,21 @@ const StorageCtrl = (function () {
   return {
     storeItem: function (item) {
       return http.post("http://127.0.0.1:80/cron_create", JSON.stringify(item));
-
-      // return http.post(
-      //   "https://56617751-ea25-4446-88aa-e7e75b461008.mock.pstmn.io/cron_create",
-      //   JSON.stringify(item)
-      // );
     },
     getItemsFromStorage() {
       return http.get("http://127.0.0.1:80/cron_list");
-
-      // return http.get(
-      //   "https://56617751-ea25-4446-88aa-e7e75b461008.mock.pstmn.io/cron_list"
-      // );
     },
     updateItemStorage: function (updatedItem) {
       return http.post(
         "http://127.0.0.1:80//cron_edit",
         JSON.stringify(updatedItem)
       );
-      // return http.post(
-      //   "https://56617751-ea25-4446-88aa-e7e75b461008.mock.pstmn.io/cron_edit",
-      //   JSON.stringify(updatedItem)
-      // );
     },
     deleteItemFromStorage: function (itemID) {
       return http.post(
         "http://127.0.0.1:80/cron_delete",
         JSON.stringify({ id: itemID })
       );
-      // return http.post(
-      //   "https://56617751-ea25-4446-88aa-e7e75b461008.mock.pstmn.io/cron_delete",
-      //   JSON.stringify({ id: itemID })
-      // );
     },
   };
 })();
