@@ -30,11 +30,11 @@ const StorageCtrl = (function () {
 const ItemCtrl = (function () {
   // Item Constructor
   const Item = function (itemData) {
-    if (data.id !== undefined) {
-      this.id = data.id;
+    if (itemData.id !== undefined) {
+      this.id = itemData.id;
     }
-    this.name = data.name;
-    this.execute = data.execute;
+    this.name = itemData.name;
+    this.execute = itemData.execute;
 
     if (itemData.data.word !== undefined && itemData.data.word !== "") {
       this.data = {
@@ -577,8 +577,10 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
     if (!validationError) {
       // Add item to data structure
       // Sending item to server
+      const currentItem = ItemCtrl.getCurrentItem();
 
       const itemToUpdate = ItemCtrl.createItem({
+        id: currentItem.id,
         name: input.name,
         execute: input.execute,
         data: {
