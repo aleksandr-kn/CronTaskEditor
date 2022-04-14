@@ -15,15 +15,11 @@ class EasyHTTP {
 
   //Make an HTTP POST Request
   async post(url, data) {
+    const response = await fetch(url, {
+      method: "POST",
+      body: data,
+    });
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: data,
-      });
-      console.log(response);
       const resData = await response.json();
       return { status: response.ok, data: resData };
     } catch (error) {

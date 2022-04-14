@@ -12,7 +12,7 @@ const StorageCtrl = (function () {
     },
     updateItemStorage: function (updatedItem) {
       return http.post(
-        "http://127.0.0.1:80//cron_edit",
+        "http://127.0.0.1:80/cron_edit",
         JSON.stringify(updatedItem)
       );
     },
@@ -36,9 +36,9 @@ const ItemCtrl = (function () {
     this.name = data.name;
     this.execute = data.execute;
 
-    if (itemData.data.keyword !== undefined && itemData.data.keyword !== "") {
+    if (itemData.data.word !== undefined && itemData.data.word !== "") {
       this.data = {
-        keyword: itemData.data.keyword,
+        word: itemData.data.word,
       };
     } else {
       this.data = {
@@ -138,8 +138,8 @@ const UICtrl = (function () {
     // Returns item html element
     createListItem: function (item) {
       let dateString;
-      if (item.data.keyword) {
-        dateString = item.data.keyword;
+      if (item.data.word) {
+        dateString = item.data.word;
       } else {
         dateString =
           item.data.minute +
@@ -195,7 +195,7 @@ const UICtrl = (function () {
         day: document.querySelector(UISelectors.dayInput).value,
         month: document.querySelector(UISelectors.monthInput).value,
         week: document.querySelector(UISelectors.weekdayInput).value,
-        keyword: document.querySelector(UISelectors.keywordInput).value,
+        word: document.querySelector(UISelectors.keywordInput).value,
       };
     },
     validateItemInput: function (input) {
@@ -243,7 +243,7 @@ const UICtrl = (function () {
           result = "Пожалуйста проверьте поле 'Неделя'.";
         }
       } else {
-        if (input.keyword === "") {
+        if (input.word === "") {
           result = "Пожалуйста проверьте поле 'Ключевое слово'.";
         }
       }
@@ -265,7 +265,7 @@ const UICtrl = (function () {
         <td>${item.execute}</td>
         <td>${
           item.timeType === "keyword"
-            ? item.keyword
+            ? item.word
             : item.minute +
               " " +
               item.hour +
@@ -336,12 +336,12 @@ const UICtrl = (function () {
         itemToAdd.data.week;
 
       // Change switch to correct position
-      if (itemToAdd.data.keyword) {
+      if (itemToAdd.data.word) {
         document.querySelector(UISelectors.timeType).checked = true;
         UICtrl.changeDateInputType();
       }
       document.querySelector(UISelectors.keywordInput).value =
-        itemToAdd.data.keyword;
+        itemToAdd.data.word;
       UICtrl.showEditState();
     },
     removeItems: function () {
@@ -500,7 +500,7 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
         name: input.name,
         execute: input.execute,
         data: {
-          keyword: input.keyword,
+          word: input.word,
           minute: input.minute,
           hour: input.hour,
           day: input.day,
@@ -533,7 +533,7 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
             throw new Error("Не удалось добавить задачу.");
           }
         })
-        .catch((error) => {
+        .catch(() => {
           // For test
           UICtrl.showAlert("Не удалось добавить задачу.", "rounded red");
         });
@@ -587,7 +587,7 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
           day: input.day,
           month: input.month,
           week: input.week,
-          keyword: input.keyword,
+          word: input.word,
         },
       });
 
