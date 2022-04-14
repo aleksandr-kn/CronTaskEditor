@@ -1,33 +1,39 @@
 class EasyHTTP {
   //Make an HTTP GET Request
   async get(url) {
-    const responce = await fetch(url);
-    const resData = await responce.json();
+    const response = await fetch(url, {
+      method: "GET",
+    });
+    try {
+      const resData = await response.json();
 
-    return { status: responce.ok, data: resData };
+      return { status: response.ok, data: resData };
+    } catch {
+      return { status: response.ok };
+    }
   }
 
   //Make an HTTP POST Request
   async post(url, data) {
-    const responce = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: data,
-    });
-
     try {
-      const resData = await responce.json();
-      return { status: responce.ok, data: resData };
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: data,
+      });
+      console.log(response);
+      const resData = await response.json();
+      return { status: response.ok, data: resData };
     } catch (error) {
-      return { status: responce.ok };
+      return { status: response.ok };
     }
   }
 
   // Make an HTTP PUT Request
   async put(url, data) {
-    const responce = await fetch(url, {
+    const response = await fetch(url, {
       method: "PUT",
       headers: {
         "Content-type": "application/json",
@@ -35,13 +41,13 @@ class EasyHTTP {
       body: JSON.stringify(data),
     });
 
-    const resData = await responce.json();
+    const resData = await response.json();
     return resData;
   }
 
   // Delete an HTTP Request
   async delete(url) {
-    const responce = await fetch(url, {
+    const response = await fetch(url, {
       method: "DELETE",
       headers: {
         "Content-type": "application/json",

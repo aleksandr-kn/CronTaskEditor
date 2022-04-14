@@ -29,37 +29,30 @@ const StorageCtrl = (function () {
 
 const ItemCtrl = (function () {
   // Item Constructor
-  const Item = function (data) {
+  const Item = function (itemData) {
     if (data.id !== undefined) {
       this.id = data.id;
     }
     this.name = data.name;
     this.execute = data.execute;
 
-    if (data.date.keyword !== undefined && data.date.keyword !== "") {
-      this.date = {
-        keyword: data.date.keyword,
+    if (itemData.data.keyword !== undefined && itemData.data.keyword !== "") {
+      this.data = {
+        keyword: itemData.data.keyword,
       };
     } else {
-      let minuteNumber = Number(data.date.minute);
-      let hourNumber = Number(data.date.hour);
-      let dayNumber = Number(data.date.day);
-      let monthNumber = Number(data.date.month);
-      let weekdayNumber = Number(data.date.weekday);
-
-      // If converted number is NaN - use the input string directly
-      this.date = {
-        minute: isNaN(minuteNumber) ? data.date.minute : minuteNumber,
-        hour: isNaN(hourNumber) ? data.date.hour : hourNumber,
-        day: isNaN(dayNumber) ? data.date.day : dayNumber,
-        month: isNaN(monthNumber) ? data.date.month : monthNumber,
-        weekday: isNaN(weekdayNumber) ? data.date.weekday : weekdayNumber,
+      this.data = {
+        minute: itemData.data.minute === "" ? "*" : itemData.data.minute,
+        hour: itemData.data.hour === "" ? "*" : itemData.data.hour,
+        day: itemData.data.day === "" ? "*" : itemData.data.day,
+        month: itemData.data.month === "" ? "*" : itemData.data.month,
+        week: itemData.data.week === "" ? "*" : itemData.data.week,
       };
     }
   };
 
   // Data Structure / State
-  const data = {
+  var data = {
     items: [],
     currentItem: null,
   };
@@ -73,9 +66,10 @@ const ItemCtrl = (function () {
         const response = await StorageCtrl.getItemsFromStorage();
         if (response.status === true) {
           data.items = response.data;
+        } else {
+          throw new Error("Ответ сервера != 200-299");
         }
       } catch (error) {
-        console.log(error);
         UICtrl.showAlert(
           "Не удалось получить список cron задач.",
           "rounded  red"
@@ -137,25 +131,26 @@ const UICtrl = (function () {
 
     itemTable: "#item-table",
     itemTableBody: ".item-table-body",
+    tablePlaceholder: ".table-placeholder",
   };
 
   return {
     // Returns item html element
     createListItem: function (item) {
       let dateString;
-      if (item.date.keyword) {
-        dateString = item.date.keyword;
+      if (item.data.keyword) {
+        dateString = item.data.keyword;
       } else {
         dateString =
-          item.date.minute +
+          item.data.minute +
           " " +
-          item.date.hour +
+          item.data.hour +
           " " +
-          item.date.day +
+          item.data.day +
           " " +
-          item.date.month +
+          item.data.month +
           " " +
-          item.date.weekday;
+          item.data.week;
       }
 
       trElement = `
@@ -174,6 +169,10 @@ const UICtrl = (function () {
     },
     populateItemList: function (items) {
       let html = "";
+
+      if (Array.isArray(items)) {
+        // array exists and is not empty
+      }
 
       items.forEach(function (item) {
         html += UICtrl.createListItem(item);
@@ -195,7 +194,7 @@ const UICtrl = (function () {
         hour: document.querySelector(UISelectors.hourInput).value,
         day: document.querySelector(UISelectors.dayInput).value,
         month: document.querySelector(UISelectors.monthInput).value,
-        weekday: document.querySelector(UISelectors.weekdayInput).value,
+        week: document.querySelector(UISelectors.weekdayInput).value,
         keyword: document.querySelector(UISelectors.keywordInput).value,
       };
     },
@@ -210,35 +209,35 @@ const UICtrl = (function () {
         if (
           // * OR [0-59] OR [0-59] - [0-59] OR [0-59] , [0-59]
           !input.minute.match(
-            /(^\*$)|(^([0-9]|[1-5]?[0-9])$)|(^([0-9]|[1-5]?[0-9])-([0-9]|[1-5]?[0-9])$)|(^([0-9]|[1-5]?[0-9]),([0-9]|[1-5]?[0-9])$)/
+            /(^$)|(^\*(\/([0-9]|[1-5]?[0-9]))?$)|(^([0-9]|[1-5]?[0-9])$)|(^([0-9]|[1-5]?[0-9])-([0-9]|[1-5]?[0-9])(\/([0-9]|[1-5]?[0-9]))?$)|(^([0-9]|[1-5]?[0-9]),([0-9]|[1-5]?[0-9])$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'Минута'.";
         } else if (
           // * OR [0-23] OR [0-23] - [0-23] OR [0-23] , [0-23]
           !input.hour.match(
-            /(^\*$)|(^(2[0-3]|[1]?[0-9])$)|(^(2[0-3]|[1]?[0-9])-(2[0-3]|[1]?[0-9])$)|(^(2[0-3]|[1]?[0-9]),(2[0-3]|[1]?[0-9])$)/
+            /(^$)|(^\*(\/(2[0-3]|[1]?[0-9]))?$)|(^(2[0-3]|[1]?[0-9])$)|(^(2[0-3]|[1]?[0-9])-(2[0-3]|[1]?[0-9])(\/(2[0-3]|[1]?[0-9]))?$)|(^(2[0-3]|[1]?[0-9]),(2[0-3]|[1]?[0-9])$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'Час'.";
         } else if (
           // * OR number [1-31] OR [1-31] - [1-31] OR [1-31] , [1-31]
           !input.day.match(
-            /(^\*$)|(^(3[01]|[12][0-9]|[1-9])$)|(^(3[01]|[12][0-9]|[1-9])-(3[01]|[12][0-9]|[1-9])$)|(^(3[01]|[12][0-9]|[1-9]),(3[01]|[12][0-9]|[1-9])$)/
+            /(^$)|(^\*(\/(3[01]|[12][0-9]|[1-9]))?$)|(^(3[01]|[12][0-9]|[1-9])$)|(^(3[01]|[12][0-9]|[1-9])-(3[01]|[12][0-9]|[1-9])(\/(3[01]|[12][0-9]|[1-9]))?$)|(^(3[01]|[12][0-9]|[1-9]),(3[01]|[12][0-9]|[1-9])$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'День'.";
         } else if (
           // * OR number [1-12] OR [1-12] - [1-12] OR [1-12] , [1-12]
           !input.month.match(
-            /(^\*$)|(^(1[0-2]|[1-9])$)|(^(1[0-2]|[1-9])-(1[0-2]|[1-9])$)|(^(1[0-2]|[1-9]),(1[0-2]|[1-9])$)/
+            /(^$)|(^\*(\/(1[0-2]|[1-9]))?$)|(^(1[0-2]|[1-9])$)|(^(1[0-2]|[1-9])-(1[0-2]|[1-9])(\/(1[0-2]|[1-9]))?$)|(^(1[0-2]|[1-9]),(1[0-2]|[1-9])$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'Месяц'.";
         } else if (
           // * OR number [0-7] OR [0-7] - [0-7] OR [0-7] , [0-7]
-          !input.weekday.match(
-            /(^\*$)|(^[0-7]$)|(^[0-7]-[0-7]$)|(^[0-7],[0-7]$)/
+          !input.week.match(
+            /(^$)|(^\*(\/[0-6])?$)|(^[0-6]$)|(^[0-6]-[0-6](\/[0-6])?$)|(^[0-6],[0-6]$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'Неделя'.";
@@ -275,7 +274,7 @@ const UICtrl = (function () {
               " " +
               item.month +
               " " +
-              item.weekday
+              item.week
         }</td>
         <td><a href="#" class="secondary-content">
           <i class="edit-item fa fa-pencil fa-lg"></i>
@@ -328,21 +327,21 @@ const UICtrl = (function () {
       document.querySelector(UISelectors.executeInput).value =
         itemToAdd.execute;
       document.querySelector(UISelectors.minuteInput).value =
-        itemToAdd.date.minute;
-      document.querySelector(UISelectors.hourInput).value = itemToAdd.date.hour;
-      document.querySelector(UISelectors.dayInput).value = itemToAdd.date.day;
+        itemToAdd.data.minute;
+      document.querySelector(UISelectors.hourInput).value = itemToAdd.data.hour;
+      document.querySelector(UISelectors.dayInput).value = itemToAdd.data.day;
       document.querySelector(UISelectors.monthInput).value =
-        itemToAdd.date.month;
+        itemToAdd.data.month;
       document.querySelector(UISelectors.weekdayInput).value =
-        itemToAdd.date.weekday;
+        itemToAdd.data.week;
 
       // Change switch to correct position
-      if (itemToAdd.date.keyword) {
+      if (itemToAdd.data.keyword) {
         document.querySelector(UISelectors.timeType).checked = true;
         UICtrl.changeDateInputType();
       }
       document.querySelector(UISelectors.keywordInput).value =
-        itemToAdd.date.keyword;
+        itemToAdd.data.keyword;
       UICtrl.showEditState();
     },
     removeItems: function () {
@@ -355,9 +354,13 @@ const UICtrl = (function () {
     },
     hideList: function () {
       document.querySelector(UISelectors.itemTable).style.display = "none";
+      document.querySelector(UISelectors.tablePlaceholder).style.display =
+        "block";
     },
     showList: function () {
       document.querySelector(UISelectors.itemTable).style.display = "table";
+      document.querySelector(UISelectors.tablePlaceholder).style.display =
+        "none";
     },
     clearEditState: function () {
       UICtrl.clearInput();
@@ -496,13 +499,13 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
       let newItem = ItemCtrl.createItem({
         name: input.name,
         execute: input.execute,
-        date: {
+        data: {
           keyword: input.keyword,
           minute: input.minute,
           hour: input.hour,
           day: input.day,
           month: input.month,
-          weekday: input.weekday,
+          week: input.week,
         },
       });
 
@@ -578,12 +581,12 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
       const itemToUpdate = ItemCtrl.createItem({
         name: input.name,
         execute: input.execute,
-        date: {
+        data: {
           minute: input.minute,
           hour: input.hour,
           day: input.day,
           month: input.month,
-          weekday: input.weekday,
+          week: input.week,
           keyword: input.keyword,
         },
       });
@@ -637,7 +640,6 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
                 UICtrl.hideList();
               } else {
                 // Populate list with items
-                // console.log(items);
                 UICtrl.populateItemList(items);
               }
               UICtrl.clearInput();
@@ -672,12 +674,8 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
             UICtrl.hideList();
           } else {
             // Populate list with items
-            // console.log(items);
             UICtrl.populateItemList(items);
           }
-
-          // Load event listeners
-          loadEventListeners();
         })
         .catch((error) => {
           UICtrl.showAlert(
@@ -685,6 +683,8 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
             "rounded red"
           );
         });
+      // Load event listeners
+      loadEventListeners();
     },
   };
 })(ItemCtrl, UICtrl, StorageCtrl);
