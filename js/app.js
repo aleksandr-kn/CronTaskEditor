@@ -155,7 +155,7 @@ const UICtrl = (function () {
 
       trElement = `
         <tr class="collection-item" id='item-${item.id}'>
-          <td>${item.name}</td>
+          <td>${item.name ? item.name : ""}</td>
           <td>${item.execute}</td>
           <td>${dateString}</td>
           <td>
@@ -171,15 +171,12 @@ const UICtrl = (function () {
       let html = "";
 
       if (Array.isArray(items)) {
-        // array exists and is not empty
+        items.forEach(function (item) {
+          html += UICtrl.createListItem(item);
+        });
+        // Insert list items
+        document.querySelector(UISelectors.itemTableBody).innerHTML = html;
       }
-
-      items.forEach(function (item) {
-        html += UICtrl.createListItem(item);
-      });
-
-      // Insert list items
-      document.querySelector(UISelectors.itemTableBody).innerHTML = html;
     },
     getItemInput: function () {
       let timeType = document.querySelector(UISelectors.timeType).checked
@@ -209,35 +206,35 @@ const UICtrl = (function () {
         if (
           // * OR [0-59] OR [0-59] - [0-59] OR [0-59] , [0-59]
           !input.minute.match(
-            /(^$)|(^\*(\/([0-9]|[1-5]?[0-9]))?$)|(^([0-9]|[1-5]?[0-9])$)|(^([0-9]|[1-5]?[0-9])-([0-9]|[1-5]?[0-9])(\/([0-9]|[1-5]?[0-9]))?$)|(^([0-9]|[1-5]?[0-9]),([0-9]|[1-5]?[0-9])$)/
+            /(^$)|(^\*(\/([0-9]|[1-5]?[0-9]))?$)|(^([0-9]|[1-5]?[0-9])$)|(^([0-9]|[1-5]?[0-9])-([0-9]|[1-5]?[0-9])(\/([0-9]|[1-5]?[0-9]))?$)|(^(([0-9]|[1-5]?[0-9])((-([0-9]|[1-5]?[0-9]))(\/([0-9]|[1-5]?[0-9]))?)?)(,(([0-9]|[1-5]?[0-9])((-([0-9]|[1-5]?[0-9]))(\/([0-9]|[1-5]?[0-9]))?)?))+$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'Минута'.";
         } else if (
           // * OR [0-23] OR [0-23] - [0-23] OR [0-23] , [0-23]
           !input.hour.match(
-            /(^$)|(^\*(\/(2[0-3]|[1]?[0-9]))?$)|(^(2[0-3]|[1]?[0-9])$)|(^(2[0-3]|[1]?[0-9])-(2[0-3]|[1]?[0-9])(\/(2[0-3]|[1]?[0-9]))?$)|(^(2[0-3]|[1]?[0-9]),(2[0-3]|[1]?[0-9])$)/
+            /(^$)|(^\*(\/(2[0-3]|[1]?[0-9]))?$)|(^(2[0-3]|[1]?[0-9])$)|(^(2[0-3]|[1]?[0-9])-(2[0-3]|[1]?[0-9])(\/(2[0-3]|[1]?[0-9]))?$)|(^((2[0-3]|[1]?[0-9])((-(2[0-3]|[1]?[0-9]))(\/(2[0-3]|[1]?[0-9]))?)?)(,((2[0-3]|[1]?[0-9])((-(2[0-3]|[1]?[0-9]))(\/(2[0-3]|[1]?[0-9]))?)?))+$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'Час'.";
         } else if (
           // * OR number [1-31] OR [1-31] - [1-31] OR [1-31] , [1-31]
           !input.day.match(
-            /(^$)|(^\*(\/(3[01]|[12][0-9]|[1-9]))?$)|(^(3[01]|[12][0-9]|[1-9])$)|(^(3[01]|[12][0-9]|[1-9])-(3[01]|[12][0-9]|[1-9])(\/(3[01]|[12][0-9]|[1-9]))?$)|(^(3[01]|[12][0-9]|[1-9]),(3[01]|[12][0-9]|[1-9])$)/
+            /(^$)|(^\*(\/(3[01]|[12][0-9]|[1-9]))?$)|(^(3[01]|[12][0-9]|[1-9])$)|(^(3[01]|[12][0-9]|[1-9])-(3[01]|[12][0-9]|[1-9])(\/(3[01]|[12][0-9]|[1-9]))?$)|(^((3[01]|[12][0-9]|[1-9])((-(3[01]|[12][0-9]|[1-9]))(\/(3[01]|[12][0-9]|[1-9]))?)?)(,((3[01]|[12][0-9]|[1-9])((-(3[01]|[12][0-9]|[1-9]))(\/(3[01]|[12][0-9]|[1-9]))?)?))+$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'День'.";
         } else if (
           // * OR number [1-12] OR [1-12] - [1-12] OR [1-12] , [1-12]
           !input.month.match(
-            /(^$)|(^\*(\/(1[0-2]|[1-9]))?$)|(^(1[0-2]|[1-9])$)|(^(1[0-2]|[1-9])-(1[0-2]|[1-9])(\/(1[0-2]|[1-9]))?$)|(^(1[0-2]|[1-9]),(1[0-2]|[1-9])$)/
+            /(^$)|(^\*(\/(1[0-2]|[1-9]))?$)|(^(1[0-2]|[1-9])$)|(^(1[0-2]|[1-9])-(1[0-2]|[1-9])(\/(1[0-2]|[1-9]))?$)|(^((1[0-2]|[1-9])((-(1[0-2]|[1-9]))(\/(1[0-2]|[1-9]))?)?)(,((1[0-2]|[1-9])((-(1[0-2]|[1-9]))(\/(1[0-2]|[1-9]))?)?))+$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'Месяц'.";
         } else if (
           // * OR number [0-7] OR [0-7] - [0-7] OR [0-7] , [0-7]
           !input.week.match(
-            /(^$)|(^\*(\/[0-6])?$)|(^[0-6]$)|(^[0-6]-[0-6](\/[0-6])?$)|(^[0-6],[0-6]$)/
+            /(^$)|(^\*(\/[0-6])?$)|(^[0-6]$)|(^[0-6]-[0-6](\/[0-6])?$)|(^([0-6]((-[0-6])(\/[0-6])?)?)(,([0-6]((-[0-6])(\/[0-6])?)?))+$)/
           )
         ) {
           result = "Пожалуйста проверьте поле 'Неделя'.";
@@ -323,7 +320,10 @@ const UICtrl = (function () {
         "none";
     },
     addItemToForm: function (itemToAdd) {
-      document.querySelector(UISelectors.itemNameInput).value = itemToAdd.name;
+      itemToAdd.name
+        ? (document.querySelector(UISelectors.itemNameInput).value =
+            itemToAdd.name)
+        : "";
       document.querySelector(UISelectors.executeInput).value =
         itemToAdd.execute;
       document.querySelector(UISelectors.minuteInput).value =
@@ -340,8 +340,10 @@ const UICtrl = (function () {
         document.querySelector(UISelectors.timeType).checked = true;
         UICtrl.changeDateInputType();
       }
-      document.querySelector(UISelectors.keywordInput).value =
-        itemToAdd.data.word;
+      document.querySelector(UISelectors.keywordInput).value = "";
+      // Find a way to change currently selected element in MaterialzeCSS select
+      // document.querySelector(UISelectors.keywordInput).value =
+      //   itemToAdd.data.word;
       UICtrl.showEditState();
     },
     removeItems: function () {
@@ -578,6 +580,8 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
       // Add item to data structure
       // Sending item to server
       const currentItem = ItemCtrl.getCurrentItem();
+
+      console.log(input);
 
       const itemToUpdate = ItemCtrl.createItem({
         id: currentItem.id,
