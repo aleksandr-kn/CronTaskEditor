@@ -132,6 +132,11 @@ const UICtrl = (function () {
     itemTable: "#item-table",
     itemTableBody: ".item-table-body",
     tablePlaceholder: ".table-placeholder",
+
+    searchInput: "#search",
+    clearSearch: ".clear-search",
+
+    btnUp: ".btn-up",
   };
 
   return {
@@ -318,6 +323,7 @@ const UICtrl = (function () {
         "block";
       document.querySelector(UISelectors.keywordInputWrapper).style.display =
         "none";
+      document.querySelector(UISelectors.searchInput).value = "";
     },
     addItemToForm: function (itemToAdd) {
       itemToAdd.name
@@ -426,6 +432,38 @@ const UICtrl = (function () {
     showAlert(message, classes) {
       M.toast({ html: message, classes: classes });
     },
+    clearSearchBar: function () {
+      document.querySelector(UISelectors.searchInput).value = "";
+      UICtrl.showAllListItems();
+    },
+    scrollToTop: function () {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    },
+    hideAllListItems: function () {
+      let listItems = document.querySelectorAll(UISelectors.collectionItem);
+      // Turn node list into array
+      listItems = Array.from(listItems);
+      listItems.forEach(function (item) {
+        item.style.display = "none";
+      });
+    },
+    showAllListItems: function () {
+      let listItems = document.querySelectorAll(UISelectors.collectionItem);
+      // Turn node list into array
+      listItems = Array.from(listItems);
+      listItems.forEach(function (item) {
+        item.style.display = "table-row";
+      });
+    },
+    hideListItem: function (id) {
+      let listItem = document.querySelector(`#item-${id}`);
+      listItem.style.display = "none";
+    },
+    showListItem: function (id) {
+      let listItem = document.querySelector(`#item-${id}`);
+      listItem.style.display = "table-row";
+    },
   };
 })();
 
@@ -479,11 +517,21 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
         e.preventDefault();
       });
 
-    // Initializion of Materialize date picker
-    document.addEventListener(
-      "DOMContentLoaded",
-      UICtrl.initializeMaterializeElements
-    );
+    // Clear the search bar event
+    document
+      .querySelector(UISelectors.clearSearch)
+      .addEventListener("click", UICtrl.clearSearchBar);
+
+    // Scroll top event
+    document
+      .querySelector(UISelectors.searchInput)
+      .addEventListener("keyup", searchKeyUp);
+
+    // Scroll top event
+    document.querySelector(UISelectors.btnUp).addEventListener("click", (e) => {
+      UICtrl.scrollToTop();
+      e.preventDefault();
+    });
   };
 
   const itemAddSubmit = function (e) {
@@ -550,6 +598,9 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
   // Click edit item
   const itemEditClick = function (e) {
     if (e.target.classList.contains("edit-item")) {
+      // Scroll to top
+      UICtrl.scrollToTop();
+
       // Get list item id (item-0, item-1)
       const itemIdAttribute = e.target.closest(UISelectors.collectionItem).id;
 
@@ -664,6 +715,40 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
         UICtrl.showAlert("Не удалось удалить задачу.", "rounded red");
       });
 
+    e.preventDefault();
+  };
+
+  const searchKeyUp = function (e) {
+    let input = document.querySelector(UISelectors.searchInput).value;
+
+    if (input === " ") {
+      UICtrl.showAllListItems();
+      return;
+    }
+
+    // Set is used to avoid repetition
+    let result = new Set();
+    let data = ItemCtrl.logData(); // REMOVE IF POSSIBLE
+
+    // Check if an property of item matches the search string
+    if (data.items) {
+      data.items.forEach((item) => {
+        if (item.name?.startsWith(input)) {
+          result.add(item.id);
+        } else if (item.execute.startsWith(input)) {
+          result.add(item.id);
+        } else if (item.data.word?.startsWith(input)) {
+          result.add(item.id);
+        }
+      });
+    }
+
+    if (result.size !== 0) {
+      UICtrl.hideAllListItems();
+      result.forEach((id) => {
+        UICtrl.showListItem(id);
+      });
+    }
     e.preventDefault();
   };
 
