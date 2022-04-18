@@ -138,6 +138,8 @@ const UICtrl = (function () {
     clearSearch: ".clear-search",
 
     btnUp: ".btn-up",
+
+    searchPlaceholder: ".search-placeholder",
   };
 
   return {
@@ -323,7 +325,7 @@ const UICtrl = (function () {
       document.querySelector(UISelectors.weekdayInputWrapper).style.display =
         "block";
       document.querySelector(UISelectors.keywordInputWrapper).style.display =
-        "none";
+        UICtrl.hideNotFoundMessage();
       document.querySelector(UISelectors.searchInput).value = "";
     },
     addItemToForm: function (itemToAdd) {
@@ -441,6 +443,7 @@ const UICtrl = (function () {
     clearSearchBar: function () {
       document.querySelector(UISelectors.searchInput).value = "";
       UICtrl.showAllListItems();
+      UICtrl.hideNotFoundMessage();
     },
     scrollToTop: function () {
       document.body.scrollTop = 0; // For Safari
@@ -469,6 +472,14 @@ const UICtrl = (function () {
     showListItem: function (id) {
       let listItem = document.querySelector(`#item-${id}`);
       listItem.style.display = "table-row";
+    },
+    hideNotFoundMessage: function () {
+      document.querySelector(UISelectors.searchPlaceholder).style.display =
+        "none";
+    },
+    showNotFoundMessage: function () {
+      document.querySelector(UISelectors.searchPlaceholder).style.display =
+        "block";
     },
   };
 })();
@@ -725,8 +736,9 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
   const searchKeyUp = function (e) {
     let input = document.querySelector(UISelectors.searchInput).value;
 
-    if (input === " ") {
+    if (input === "") {
       UICtrl.showAllListItems();
+      UICtrl.hideNotFoundMessage();
       return;
     }
 
@@ -737,22 +749,35 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
     // Check if an property of item matches the search string
     if (data.items) {
       data.items.forEach((item) => {
-        if (item.name?.startsWith(input)) {
+        if (
+          item.name?.toLowerCase().indexOf(input.toLowerCase()) !== -1 &&
+          typeof item.name !== "undefined"
+        ) {
           result.add(item.id);
-        } else if (item.execute.startsWith(input)) {
+        } else if (
+          item.execute.toLowerCase().indexOf(input.toLowerCase()) !== -1
+        ) {
           result.add(item.id);
-        } else if (item.data.word?.startsWith(input)) {
+        } else if (
+          item.data.word?.toLowerCase().indexOf(input.toLowerCase()) !== -1 &&
+          typeof item.name !== "undefined"
+        ) {
           result.add(item.id);
         }
       });
     }
 
-    if (result.size !== 0) {
+    if (result.size > 0) {
       UICtrl.hideAllListItems();
       result.forEach((id) => {
         UICtrl.showListItem(id);
       });
+    } else {
+      console.log("test");
+      UICtrl.hideAllListItems();
+      UICtrl.showNotFoundMessage();
     }
+
     e.preventDefault();
   };
 
