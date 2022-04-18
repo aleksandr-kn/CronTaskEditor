@@ -735,7 +735,6 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
 
   const searchKeyUp = function (e) {
     let input = document.querySelector(UISelectors.searchInput).value;
-
     if (input === "") {
       UICtrl.showAllListItems();
       UICtrl.hideNotFoundMessage();
@@ -760,14 +759,15 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
           result.add(item.id);
         } else if (
           item.data.word?.toLowerCase().indexOf(input.toLowerCase()) !== -1 &&
-          typeof item.name !== "undefined"
+          typeof item.data.word !== "undefined"
         ) {
           result.add(item.id);
         }
       });
     }
 
-    if (result.size > 0) {
+    console.log(result);
+    if (result.size !== 0) {
       UICtrl.hideAllListItems();
       result.forEach((id) => {
         UICtrl.showListItem(id);
